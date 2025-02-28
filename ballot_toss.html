@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Ballot Position Toss</title>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script>
+        // Initialize EmailJS with your Public Key
+        emailjs.init("pVu81PKNExV8ld2wb"); // Your Public Key
+
+        let assignedPositions = [];
+        let totalCandidates = 11; // Updated to 11 candidates
+
+        function tossPosition() {
+            let candidateName = document.getElementById("candidateName").value.trim();
+            if (!candidateName) {
+                alert("Please enter your name.");
+                return;
+            }
+
+            if (assignedPositions.length >= totalCandidates) {
+                alert("All positions have been assigned.");
+                return;
+            }
+
+            let position;
+            do {
+                position = Math.floor(Math.random() * totalCandidates) + 1; // Generates numbers from 1 to 11
+            } while (assignedPositions.includes(position));
+
+            assignedPositions.push(position);
+
+            // Display result on the webpage
+            document.getElementById("results").innerHTML += 
+                `<p><strong>${candidateName}</strong> got position <strong>${position}</strong></p>`;
+
+            // Prepare email parameters
+            let emailParams = {
+                candidate_name: candidateName,
+                ballot_position: position
+            };
+
+            // Send email using EmailJS
+            emailjs.send("service_aumkp6t", "template_22ueffc", emailParams)
+                .then(response => {
+                    alert(`Email sent successfully to ${candidateName}! ✅`);
+                })
+                .catch(error => {
+                    console.error("EmailJS Error:", error);
+                    alert("Error sending email. Check console for details.");
+                });
+        }
+    </script>
+</head>
+<body>
+    <h2>🎲 Online Ballot Position Toss</h2>
+    <p>Enter your name and click the button to get your random ballot position.</p>
+    <input type="text" id="candidateName" placeholder="Enter your name">
+    <button onclick="tossPosition()">Toss for Position</button>
+    <h3>Results:</h3>
+    <div id="results"></div>
+</body>
+</html>
